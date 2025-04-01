@@ -1,0 +1,131 @@
+.add-book-unit-container,
+.edit-book-unit-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+.add-book-unit-container h1,
+.edit-book-unit-container h1 {
+    color: #333;
+    margin-bottom: 2rem;
+}
+
+.book-unit-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="url"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #2196F3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+.form-group.checkbox {
+    display: flex;
+    align-items: center;
+}
+
+.form-group.checkbox label {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    cursor: pointer;
+}
+
+.form-group.checkbox input[type="checkbox"] {
+    margin-right: 0.5rem;
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.submit-button,
+.cancel-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.submit-button {
+    background-color: #1976d2;
+    color: white;
+}
+
+.submit-button:hover {
+    background-color: #1565c0;
+}
+
+.cancel-button {
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.cancel-button:hover {
+    background-color: #e0e0e0;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.error {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.add-book-unit-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+
+.page-header {
+    position: relative;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.page-header h1 {
+    margin: 0;
+    color: #333;
+} 

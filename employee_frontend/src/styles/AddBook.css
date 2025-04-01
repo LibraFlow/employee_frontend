@@ -1,0 +1,36 @@
+.add-book-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+
+.page-header {
+    position: relative;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.page-header h1 {
+    margin: 0;
+    color: #333;
+}
+
+.book-form {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.book-form .MuiTextField-root {
+    margin-bottom: 1rem;
+}
+
+.error {
+    color: #d32f2f;
+    background-color: #ffebee;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+} 
