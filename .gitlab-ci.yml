@@ -3,7 +3,6 @@ image: node:18
 stages:
   - build
   - test
-  - deploy
 
 cache:
   paths:
@@ -37,14 +36,3 @@ test:
     - main
     - develop
     - merge_requests
-
-deploy:
-  stage: deploy
-  script:
-    - echo "Deploying to production"
-    # Add your deployment commands here
-    # For example, if using AWS S3:
-    # - aws s3 sync build/ s3://your-bucket-name/
-  only:
-    - main
-  when: manual
