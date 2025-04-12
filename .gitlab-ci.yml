@@ -1,4 +1,4 @@
-image: node:18-alpine
+image: node:18
 
 stages:
   - build
@@ -12,10 +12,10 @@ cache:
 build:
   stage: build
   script:
-    - pwd
-    - ls -la
+    - Get-Location
+    - Get-ChildItem
     - cd employee_frontend
-    - ls -la
+    - Get-ChildItem
     - npm install
     - npm run build
   artifacts:
