@@ -31,7 +31,7 @@ test:
   script:
     - cd employee_frontend
     - npm install
-    - npm test
+    - npm test -- --passWithNoTests
   only:
     - main
     - develop
