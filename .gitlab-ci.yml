@@ -1,0 +1,50 @@
+stages:
+  - security_testing
+  - build
+  - test
+
+variables:
+  NODE_VERSION: "18.17.0"
+
+cache:
+  paths:
+    - node_modules/
+    - .npm/
+
+# Security testing stage
+security_audit:
+  stage: security_testing
+  image: node:$NODE_VERSION
+  script:
+    - cd employee_frontend
+    - npm install
+    - npm audit
+  artifacts:
+    reports:
+      security: employee_frontend/npm-audit-report.json
+  allow_failure: true
+
+# Build stage
+build:
+  stage: build
+  image: node:$NODE_VERSION
+  script:
+    - cd employee_frontend
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - employee_frontend/build/
+  dependencies:
+    - security_audit
+
+# Test stage
+test:
+  stage: test
+  image: node:$NODE_VERSION
+  script:
+    - cd employee_frontend
+    - npm install
+    - npm test
+  dependencies:
+    - build
