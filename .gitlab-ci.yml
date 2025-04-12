@@ -12,6 +12,10 @@ cache:
 build:
   stage: build
   script:
+    - pwd
+    - ls -la
+    - cd employee_frontend
+    - ls -la
     - npm install
     - npm run build
   artifacts:
@@ -26,6 +30,7 @@ build:
 test:
   stage: test
   script:
+    - cd employee_frontend
     - npm install
     - npm test
   only:
