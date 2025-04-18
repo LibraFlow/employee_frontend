@@ -116,7 +116,7 @@ const BooksByGenrePage = () => {
                     ← Back
                 </button>
                 <h1>{genre} Books</h1>
-                <button className="add-button" onClick={() => navigate('/add')}>
+                <button className="add-button" onClick={handleAddBook}>
                     ➕ Add Book
                 </button>
             </div>
@@ -164,104 +164,120 @@ const BooksByGenrePage = () => {
                 ))}
             </div>
 
-            <div className="dialog-overlay" style={{ display: editDialogOpen ? 'block' : 'none' }}>
-                <div className="dialog">
-                    <h2>Edit Book</h2>
-                    <form onSubmit={(e) => {
-                        e.preventDefault();
-                        handleEditSubmit();
-                    }}>
-                        <label>Title</label>
-                        <input
-                            type="text"
-                            value={editForm.title}
-                            onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                        />
-                        <label>Author</label>
-                        <input
-                            type="text"
-                            value={editForm.author}
-                            onChange={(e) => setEditForm({ ...editForm, author: e.target.value })}
-                        />
-                        <label>Year</label>
-                        <input
-                            type="number"
-                            value={editForm.year}
-                            onChange={(e) => setEditForm({ ...editForm, year: e.target.value })}
-                        />
-                        <label>Genre</label>
-                        <select
-                            value={editForm.genre}
-                            onChange={(e) => setEditForm({ ...editForm, genre: e.target.value })}
-                        >
-                            {genres.map((option) => (
-                                <option key={option} value={option}>
-                                    {option}
-                                </option>
-                            ))}
-                        </select>
-                        <label>Description</label>
-                        <textarea
-                            value={editForm.description}
-                            onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                        />
-                        <button type="submit">Save Changes</button>
-                        <button onClick={() => setEditDialogOpen(false)}>Cancel</button>
-                    </form>
+            {editDialogOpen && (
+                <div className="dialog-overlay" onClick={() => setEditDialogOpen(false)}>
+                    <div className="dialog" onClick={e => e.stopPropagation()}>
+                        <h2>Edit Book</h2>
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            handleEditSubmit();
+                        }}>
+                            <label>Title</label>
+                            <input
+                                type="text"
+                                value={editForm.title}
+                                onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                            />
+                            <label>Author</label>
+                            <input
+                                type="text"
+                                value={editForm.author}
+                                onChange={(e) => setEditForm({ ...editForm, author: e.target.value })}
+                            />
+                            <label>Year</label>
+                            <input
+                                type="number"
+                                value={editForm.year}
+                                onChange={(e) => setEditForm({ ...editForm, year: e.target.value })}
+                            />
+                            <label>Genre</label>
+                            <select
+                                value={editForm.genre}
+                                onChange={(e) => setEditForm({ ...editForm, genre: e.target.value })}
+                            >
+                                {genres.map((option) => (
+                                    <option key={option} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                            <label>Description</label>
+                            <textarea
+                                value={editForm.description}
+                                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                            />
+                            <div className="dialog-actions">
+                                <button type="button" onClick={() => setEditDialogOpen(false)}>
+                                    Cancel
+                                </button>
+                                <button type="submit">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            )}
 
-            <div className="dialog-overlay" style={{ display: addDialogOpen ? 'block' : 'none' }}>
-                <div className="dialog">
-                    <h2>Add New Book</h2>
-                    <form onSubmit={(e) => {
-                        e.preventDefault();
-                        handleSubmit();
-                    }}>
-                        <label>Title</label>
-                        <input
-                            type="text"
-                            value={newBook.title}
-                            onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
-                            required
-                        />
-                        <label>Author</label>
-                        <input
-                            type="text"
-                            value={newBook.author}
-                            onChange={(e) => setNewBook({ ...newBook, author: e.target.value })}
-                            required
-                        />
-                        <label>Year</label>
-                        <input
-                            type="number"
-                            value={newBook.year}
-                            onChange={(e) => setNewBook({ ...newBook, year: e.target.value })}
-                            required
-                        />
-                        <label>Genre</label>
-                        <select
-                            value={newBook.genre}
-                            onChange={(e) => setNewBook({ ...newBook, genre: e.target.value })}
-                            required
-                        >
-                            {genres.map((option) => (
-                                <option key={option} value={option}>
-                                    {option}
-                                </option>
-                            ))}
-                        </select>
-                        <label>Description</label>
-                        <textarea
-                            value={newBook.description}
-                            onChange={(e) => setNewBook({ ...newBook, description: e.target.value })}
-                            required
-                        />
-                        <button type="submit">Add Book</button>
-                        <button onClick={handleCloseDialog}>Cancel</button>
-                    </form>
+            {addDialogOpen && (
+                <div className="dialog-overlay" onClick={handleCloseDialog}>
+                    <div className="dialog" onClick={e => e.stopPropagation()}>
+                        <h2>Add New Book</h2>
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSubmit();
+                        }}>
+                            <label>Title</label>
+                            <input
+                                type="text"
+                                value={newBook.title}
+                                onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
+                                required
+                            />
+                            <label>Author</label>
+                            <input
+                                type="text"
+                                value={newBook.author}
+                                onChange={(e) => setNewBook({ ...newBook, author: e.target.value })}
+                                required
+                            />
+                            <label>Year</label>
+                            <input
+                                type="number"
+                                value={newBook.year}
+                                onChange={(e) => setNewBook({ ...newBook, year: e.target.value })}
+                                required
+                            />
+                            <label>Genre</label>
+                            <select
+                                value={newBook.genre}
+                                onChange={(e) => setNewBook({ ...newBook, genre: e.target.value })}
+                                required
+                            >
+                                {genres.map((option) => (
+                                    <option key={option} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                            <label>Description</label>
+                            <textarea
+                                value={newBook.description}
+                                onChange={(e) => setNewBook({ ...newBook, description: e.target.value })}
+                                required
+                            />
+                            <div className="dialog-actions">
+                                <button type="button" onClick={handleCloseDialog}>
+                                    Cancel
+                                </button>
+                                <button type="submit">
+                                    Add Book
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

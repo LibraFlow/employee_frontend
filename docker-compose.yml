@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  employee-frontend:
+    build:
+      context: ./employee_frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+    volumes:
+      - ./employee_frontend:/app
+      - /app/node_modules
+    restart: unless-stopped 

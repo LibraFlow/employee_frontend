@@ -17,14 +17,16 @@ const BookUnitsPage = () => {
         pageCount: '',
         coverImageLink: '',
         publisher: '',
-        isbn: ''
+        isbn: '',
+        availability: true
     });
     const [formData, setFormData] = useState({
         language: '',
         pageCount: '',
         publisher: '',
         isbn: '',
-        coverImageLink: ''
+        coverImageLink: '',
+        availability: true
     });
 
     useEffect(() => {
@@ -51,7 +53,8 @@ const BookUnitsPage = () => {
             pageCount: unit.pageCount,
             coverImageLink: unit.coverImageLink,
             publisher: unit.publisher,
-            isbn: unit.isbn
+            isbn: unit.isbn,
+            availability: unit.availability
         });
         setEditDialogOpen(true);
     };
@@ -59,7 +62,12 @@ const BookUnitsPage = () => {
     const handleEditSubmit = async (e) => {
         e.preventDefault();
         try {
-            await bookUnitService.updateBookUnit(selectedUnit.id, editForm);
+            await bookUnitService.updateBookUnit(selectedUnit.id, {
+                ...editForm,
+                id: selectedUnit.id,
+                bookId: selectedUnit.bookId,
+                pageCount: parseInt(editForm.pageCount)
+            });
             setEditDialogOpen(false);
             loadBookUnits();
         } catch (err) {
@@ -76,7 +84,9 @@ const BookUnitsPage = () => {
         try {
             await bookUnitService.createBookUnit({
                 ...formData,
-                bookId
+                bookId,
+                availability: true,
+                pageCount: parseInt(formData.pageCount)
             });
             setAddDialogOpen(false);
             loadBookUnits();
@@ -85,7 +95,8 @@ const BookUnitsPage = () => {
                 pageCount: '',
                 publisher: '',
                 isbn: '',
-                coverImageLink: ''
+                coverImageLink: '',
+                availability: true
             });
         } catch (err) {
             console.error('Error creating book unit:', err);
@@ -187,6 +198,14 @@ const BookUnitsPage = () => {
                                 value={editForm.isbn}
                                 onChange={(e) => setEditForm({...editForm, isbn: e.target.value})}
                             />
+                            <label>Availability</label>
+                            <select
+                                value={editForm.availability}
+                                onChange={(e) => setEditForm({...editForm, availability: e.target.value === 'true'})}
+                            >
+                                <option value="true">Available</option>
+                                <option value="false">Unavailable</option>
+                            </select>
                             <div className="dialog-actions">
                                 <button type="button" onClick={() => setEditDialogOpen(false)}>
                                     Cancel
