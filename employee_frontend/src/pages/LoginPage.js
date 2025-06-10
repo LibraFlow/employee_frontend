@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './LoginPage.css';
 
 const LoginPage = ({ onLogin }) => {
@@ -12,7 +12,7 @@ const LoginPage = ({ onLogin }) => {
     e.preventDefault();
     setError('');
     try {
-      const response = await fetch('http://localhost:3000/userservice/api/v1/users/login', {
+      const response = await fetch('http://localhost:3000/userservice/api/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -36,15 +36,19 @@ const LoginPage = ({ onLogin }) => {
         <form onSubmit={handleSubmit} className="login-form">
           <div className="login-form-group">
             <label>Username</label>
-            <input type="text" value={username} onChange={e => setUsername(e.target.value)} required />
+            <input data-cy="username-input" type="text" value={username} onChange={e => setUsername(e.target.value)} required />
           </div>
           <div className="login-form-group">
             <label>Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+            <input data-cy="password-input" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
           </div>
           {error && <div className="login-error">{error}</div>}
-          <button type="submit" className="login-btn">Login</button>
+          <button data-cy="login-button" type="submit" className="login-btn">Login</button>
         </form>
+        <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+          <span>Don't have an account? </span>
+          <Link to="/register" data-cy="register-link">Register here</Link>
+        </div>
       </div>
     </div>
   );

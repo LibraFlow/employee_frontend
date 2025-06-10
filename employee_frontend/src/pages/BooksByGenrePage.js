@@ -38,6 +38,11 @@ const BooksByGenrePage = () => {
         genre: genre,
         description: ''
     });
+    const [addBookError, setAddBookError] = useState('');
+    const [editBookError, setEditBookError] = useState('');
+    const [deleteBookError, setDeleteBookError] = useState('');
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [bookToDelete, setBookToDelete] = useState(null);
 
     const loadBooks = useCallback(async () => {
         try {
@@ -70,13 +75,34 @@ const BooksByGenrePage = () => {
     };
 
     const handleEditSubmit = async () => {
+        setEditBookError('');
+        if (editForm.title.length > 40) {
+            setEditBookError('Title is too long. Please use 40 characters or fewer.');
+            return;
+        }
+        if (editForm.author.length > 40) {
+            setEditBookError('Author is too long. Please use 40 characters or fewer.');
+            return;
+        }
+        if (editForm.genre.length > 40) {
+            setEditBookError('Genre is too long. Please use 40 characters or fewer.');
+            return;
+        }
+        if (editForm.description.length > 1000) {
+            setEditBookError('Description is too long. Please use 1000 characters or fewer.');
+            return;
+        }
+        if (!editForm.year) {
+            setEditBookError('Year is required.');
+            return;
+        }
         try {
             await bookService.updateBook(selectedBook.id, editForm);
             setEditDialogOpen(false);
             loadBooks();
-        } catch (err) {
-            console.error('Error updating book:', err);
-            alert('Failed to update book. Please try again.');
+        } catch (error) {
+            setEditBookError('Failed to update book. Please try again.');
+            console.error('Error updating book:', error);
         }
     };
 
@@ -96,14 +122,61 @@ const BooksByGenrePage = () => {
     };
 
     const handleSubmit = async () => {
+        setAddBookError('');
+        if (newBook.title.length > 40) {
+            setAddBookError('Title is too long. Please use 40 characters or fewer.');
+            return;
+        }
+        if (newBook.author.length > 40) {
+            setAddBookError('Author is too long. Please use 40 characters or fewer.');
+            return;
+        }
+        if (newBook.genre.length > 40) {
+            setAddBookError('Genre is too long. Please use 40 characters or fewer.');
+            return;
+        }
+        if (newBook.description.length > 1000) {
+            setAddBookError('Description is too long. Please use 1000 characters or fewer.');
+            return;
+        }
+        if (!newBook.year) {
+            setAddBookError('Year is required.');
+            return;
+        }
         try {
             await bookService.createBook(newBook);
             handleCloseDialog();
             loadBooks();
         } catch (error) {
+            setAddBookError('Failed to add book. Please try again.');
             console.error('Error creating book:', error);
-            alert('Failed to add book. Please try again.');
         }
+    };
+
+    const handleDeleteBookClick = (bookId) => {
+        setBookToDelete(bookId);
+        setShowDeleteModal(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        setDeleteBookError('');
+        setShowDeleteModal(false);
+        try {
+            await bookService.deleteBook(bookToDelete);
+            setBookToDelete(null);
+            loadBooks();
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                setDeleteBookError('This book has already been deleted by another employee.');
+            } else {
+                setDeleteBookError('Failed to delete book. Please try again.');
+        }
+        }
+    };
+
+    const handleCancelDelete = () => {
+        setShowDeleteModal(false);
+        setBookToDelete(null);
     };
 
     if (loading) return <div className="loading">Loading...</div>;
@@ -120,6 +193,23 @@ const BooksByGenrePage = () => {
                     ➕ Add Book
                 </button>
             </div>
+
+            {deleteBookError && (
+                <div className="error" data-cy="delete-book-error">{deleteBookError}</div>
+            )}
+
+            {showDeleteModal && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h3>Delete Book</h3>
+                        <p>Are you sure you want to delete this book? This action cannot be undone.</p>
+                        <div className="modal-actions">
+                            <button className="btn btn-danger" onClick={handleConfirmDelete} data-cy="confirm-delete">Delete</button>
+                            <button className="btn btn-secondary" onClick={handleCancelDelete} data-cy="cancel-delete">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="books-grid">
                 {books.map((book) => (
@@ -149,11 +239,7 @@ const BooksByGenrePage = () => {
                                     className="delete-button"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        if (window.confirm('Are you sure you want to delete this book?')) {
-                                            bookService.deleteBook(book.id)
-                                                .then(() => loadBooks())
-                                                .catch(err => console.error('Error deleting book:', err));
-                                        }
+                                        handleDeleteBookClick(book.id);
                                     }}
                                 >
                                     🗑️
@@ -172,6 +258,7 @@ const BooksByGenrePage = () => {
                             e.preventDefault();
                             handleEditSubmit();
                         }}>
+                            {editBookError && <div className="error" data-cy="edit-book-error">{editBookError}</div>}
                             <label>Title</label>
                             <input
                                 type="text"
@@ -227,6 +314,7 @@ const BooksByGenrePage = () => {
                             e.preventDefault();
                             handleSubmit();
                         }}>
+                            {addBookError && <div className="error" data-cy="add-book-error">{addBookError}</div>}
                             <label>Title</label>
                             <input
                                 type="text"

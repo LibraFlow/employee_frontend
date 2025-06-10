@@ -26,7 +26,7 @@ const bookUnitService = {
     // Create a new book unit
     createBookUnit: async (bookUnit) => {
         try {
-            const response = await axios.post(API_URL, bookUnit);
+            const response = await axios.post(API_URL, bookUnit, { withCredentials: true });
             return response.data;
         } catch (error) {
             throw error;
@@ -36,7 +36,7 @@ const bookUnitService = {
     // Update a book unit
     updateBookUnit: async (id, bookUnit) => {
         try {
-            const response = await axios.put(`${API_URL}/${id}`, bookUnit);
+            const response = await axios.put(`${API_URL}/${id}`, bookUnit, { withCredentials: true });
             return response.data;
         } catch (error) {
             throw error;
@@ -46,7 +46,17 @@ const bookUnitService = {
     // Delete a book unit
     deleteBookUnit: async (id) => {
         try {
-            await axios.delete(`${API_URL}/${id}`);
+            await axios.delete(`${API_URL}/${id}`, { withCredentials: true });
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // Get unavailable and overdue book units
+    getUnavailableOverdueBookUnits: async () => {
+        try {
+            const response = await axios.get(`${API_URL}/unavailable-overdue`, { withCredentials: true });
+            return response.data;
         } catch (error) {
             throw error;
         }

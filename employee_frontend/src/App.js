@@ -5,26 +5,54 @@ import GenresPage from './pages/GenresPage';
 import BooksByGenrePage from './pages/BooksByGenrePage';
 import BookUnitsPage from './pages/BookUnitsPage';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import OverdueUnavailableUnitsPage from './pages/OverdueUnavailableUnitsPage';
+import ProfilePage from './pages/ProfilePage';
 import './App.css';
+import userService from './services/userService';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRoles, setUserRoles] = useState([]);
   const navigate = useNavigate();
 
-  // Check auth state on mount
+  // Check auth state and roles on mount
   useEffect(() => {
-    fetch('http://localhost:3000/userservice/api/v1/users/me', {
-      credentials: 'include',
-    })
-      .then(res => res.ok ? setIsAuthenticated(true) : setIsAuthenticated(false))
-      .catch(() => setIsAuthenticated(false));
+    const fetchUser = async () => {
+      try {
+        const user = await userService.getCurrentUser();
+        if (user && Array.isArray(user.roles) && (user.roles.includes('LIBRARIAN') || user.roles.includes('ADMINISTRATOR'))) {
+          setIsAuthenticated(true);
+          setUserRoles(user.roles);
+        } else {
+          setIsAuthenticated(false);
+          setUserRoles([]);
+        }
+      } catch {
+        setIsAuthenticated(false);
+        setUserRoles([]);
+      }
+    };
+    fetchUser();
   }, []);
 
   const handleLogout = async () => {
-    // Remove the jwt cookie by calling a backend logout endpoint if available, or client-side expire
-    document.cookie = 'jwt=; Max-Age=0; path=/;';
+    await fetch('http://localhost:3000/userservice/api/v1/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
     setIsAuthenticated(false);
-    navigate('/login');
+    setUserRoles([]);
+    window.location.href = '/login';
+  };
+
+  // Route protection wrapper
+  const ProtectedRoute = ({ element }) => {
+    if (!isAuthenticated || !(userRoles.includes('LIBRARIAN') || userRoles.includes('ADMINISTRATOR'))) {
+      navigate('/');
+      return null;
+    }
+    return element;
   };
 
   return (
@@ -38,10 +66,18 @@ function App() {
             <Link to="/genres" className="nav-link">
               Genres
             </Link>
+            <Link to="/overdue-unavailable-units" className="nav-link">
+              Overdue Books
+            </Link>
+            {isAuthenticated && (
+              <Link to="/profile" className="nav-link">
+                Profile
+              </Link>
+            )}
           </div>
           <div style={{ marginLeft: 'auto' }}>
             {isAuthenticated ? (
-              <button className="nav-link" onClick={handleLogout}>
+              <button className="nav-link logout-btn" data-cy="logout-btn" onClick={handleLogout}>
                 Logout
               </button>
             ) : (
@@ -55,10 +91,22 @@ function App() {
       <main className="main-content">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/genres" element={<GenresPage />} />
-          <Route path="/genres/:genre" element={<BooksByGenrePage />} />
-          <Route path="/books/:bookId/units" element={<BookUnitsPage />} />
-          <Route path="/login" element={<LoginPage onLogin={() => setIsAuthenticated(true)} />} />
+          <Route path="/login" element={<LoginPage onLogin={async () => {
+            const user = await userService.getCurrentUser();
+            if (user && Array.isArray(user.roles) && (user.roles.includes('LIBRARIAN') || user.roles.includes('ADMINISTRATOR'))) {
+              setIsAuthenticated(true);
+              setUserRoles(user.roles);
+            } else {
+              setIsAuthenticated(false);
+              setUserRoles([]);
+            }
+          }} />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/genres" element={<ProtectedRoute element={<GenresPage />} />} />
+          <Route path="/genres/:genre" element={<ProtectedRoute element={<BooksByGenrePage />} />} />
+          <Route path="/books/:bookId/units" element={<ProtectedRoute element={<BookUnitsPage />} />} />
+          <Route path="/overdue-unavailable-units" element={<ProtectedRoute element={<OverdueUnavailableUnitsPage />} />} />
+          <Route path="/profile" element={<ProtectedRoute element={<ProfilePage />} />} />
         </Routes>
       </main>
     </div>
