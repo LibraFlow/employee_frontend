@@ -63,16 +63,18 @@ function App() {
             📚 LibraFlow
           </Link>
           <div className="nav-links">
+            {isAuthenticated && (
+              <>
             <Link to="/genres" className="nav-link">
               Genres
             </Link>
-            <Link to="/overdue-unavailable-units" className="nav-link">
-              Overdue Books
-            </Link>
-            {isAuthenticated && (
-              <Link to="/profile" className="nav-link">
-                Profile
-              </Link>
+                <Link to="/overdue-unavailable-units" className="nav-link">
+                  Overdue Books
+                </Link>
+                <Link to="/profile" className="nav-link">
+                  Profile
+                </Link>
+              </>
             )}
           </div>
           <div style={{ marginLeft: 'auto' }}>

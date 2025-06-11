@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  book-server:
+    image: registry.gitlab.com/i459452/LibraFlow_Book_Server:latest
+    ports:
+      - "8081:8081"
+    depends_on:
+      - rabbitmq
+
+  bookunit-server:
+    image: registry.gitlab.com/i459452/LibraFlow_BookUnit_Server:latest
+    ports:
+      - "8082:8082"
+    depends_on:
+      - rabbitmq
+
+  user-server:
+    image: registry.gitlab.com/i459452/LibraFlow_User_Server:latest
+    ports:
+      - "8083:8083"
+    depends_on:
+      - rabbitmq
+
+  borrowing-server:
+    image: registry.gitlab.com/i459452/LibraFlow_Borrowing_Server:latest
+    ports:
+      - "8084:8084"
+    depends_on:
+      - rabbitmq
+
+  api-gateway:
+    image: registry.gitlab.com/i459452/LibraFlow_API_Gateway:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - book-server
+      - bookunit-server
+      - user-server
+      - borrowing-server
+      - rabbitmq
+
+  employee-frontend:
+    build: ./employee_frontend
+    ports:
+      - "3001:3001"
+    depends_on:
+      - api-gateway

@@ -162,11 +162,11 @@ const BookUnitsPage = () => {
 
     const handleConfirmDeleteUnit = async () => {
         setShowDeleteUnitModal(false);
-        try {
+            try {
             await bookUnitService.deleteBookUnit(unitToDelete);
             setUnitToDelete(null);
-            loadBookUnits();
-        } catch (err) {
+                loadBookUnits();
+            } catch (err) {
             // Optionally handle error
             setUnitToDelete(null);
         }
