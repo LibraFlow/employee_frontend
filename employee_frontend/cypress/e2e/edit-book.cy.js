@@ -19,6 +19,9 @@ describe('Book Management - Edit Book', () => {
     cy.get('[data-cy=register-role]').select('Administrator');
     cy.get('[data-cy=register-role]').should('have.value', 'ADMINISTRATOR');
     cy.get('[data-cy=register-submit]').click();
+    cy.contains('Terms and Policy').should('be.visible');
+    cy.get('#policy-check').check({ force: true });
+    cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
     cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
   });
 

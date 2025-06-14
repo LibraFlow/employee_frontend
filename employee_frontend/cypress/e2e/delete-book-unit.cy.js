@@ -7,7 +7,7 @@ describe('Delete Book Unit', () => {
     address: '123 Library St',
     phone: '+1234567890',
   };
-  const bookTitle = 'Cypress Book For Delete Unit';
+  const bookTitle = `Cypress Book For Delete Unit ${uniqueId}`;
   const unitData = {
     language: 'DeleteLang',
     pageCount: '444',
@@ -26,6 +26,9 @@ describe('Delete Book Unit', () => {
     cy.get('[data-cy=register-role]').select('Administrator');
     cy.get('[data-cy=register-role]').should('have.value', 'ADMINISTRATOR');
     cy.get('[data-cy=register-submit]').click();
+    cy.contains('Terms and Policy').should('be.visible');
+    cy.get('#policy-check').check({ force: true });
+    cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
     cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
   });
 
@@ -83,6 +86,8 @@ describe('Delete Book Unit', () => {
     cy.get('.modal').should('be.visible');
     cy.get('[data-cy=confirm-delete-unit]').click();
     cy.get('.modal').should('not.exist');
-    cy.get('.unit-card').should('not.exist');
+    cy.contains('.unit-card', unitData.language).should('not.exist');
+    cy.contains('.unit-card', unitData.publisher).should('not.exist');
+    cy.contains('.unit-card', unitData.isbn).should('not.exist');
   });
 }); 

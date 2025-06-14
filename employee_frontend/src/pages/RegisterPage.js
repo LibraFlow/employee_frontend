@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../styles/Modal.css';
+
+const POLICY_TEXT = `By registering, you agree to the following:\n\n- Your personal data (username, email, address, phone, and role) is collected and stored for the purposes of account management, library operations, and legal compliance.\n- Your data is protected using industry-standard security measures and is only accessible to authorized personnel. It will not be shared with third parties except as required by law.\n- You have the right to access, correct, or request deletion of your data at any time. You may also deactivate your account whenever you wish.\n- For any questions or concerns about your data, please contact the library administration.`;
 
 const RegisterPage = () => {
   const [form, setForm] = useState({
@@ -13,14 +16,27 @@ const RegisterPage = () => {
   const [success, setSuccess] = useState('');
   const [role, setRole] = useState('LIBRARIAN');
   const navigate = useNavigate();
+  const [showPolicy, setShowPolicy] = useState(false);
+  const [policyChecked, setPolicyChecked] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
+    setShowPolicy(true);
+    setPolicyChecked(false);
+    setPendingSubmit(true);
+  };
+
+  const handlePolicyAgree = async () => {
+    setShowPolicy(false);
+    setPendingSubmit(false);
     setError('');
     setSuccess('');
     try {
@@ -39,6 +55,11 @@ const RegisterPage = () => {
     } catch (err) {
       setError('Network error.');
     }
+  };
+
+  const handlePolicyCancel = () => {
+    setShowPolicy(false);
+    setPendingSubmit(false);
   };
 
   return (
@@ -77,6 +98,34 @@ const RegisterPage = () => {
           {success && <div className="login-success" data-cy="register-success">{success}</div>}
           <button data-cy="register-submit" type="submit" className="login-btn">Register</button>
         </form>
+        {showPolicy && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h3>Terms and Policy</h3>
+              <pre style={{whiteSpace: 'pre-wrap', textAlign: 'left'}}>{POLICY_TEXT}</pre>
+              <div style={{margin: '1em 0'}}>
+                <input
+                  type="checkbox"
+                  id="policy-check"
+                  checked={policyChecked}
+                  onChange={e => setPolicyChecked(e.target.checked)}
+                />
+                <label htmlFor="policy-check" style={{marginLeft: '0.5em'}}>I agree to the terms and policy above</label>
+              </div>
+              <div style={{display: 'flex', justifyContent: 'flex-end', gap: '1em'}}>
+                <button onClick={handlePolicyCancel} className="modal-btn cancel">Cancel</button>
+                <button
+                  onClick={handlePolicyAgree}
+                  className="modal-btn agree"
+                  disabled={!policyChecked}
+                  style={{background: policyChecked ? '#1976d2' : '#aaa', color: '#fff'}}
+                >
+                  Agree and Register
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

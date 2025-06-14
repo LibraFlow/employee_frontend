@@ -21,6 +21,9 @@ describe('Edit Book - Cancel', () => {
     cy.get('[data-cy=register-role]').select('Administrator');
     cy.get('[data-cy=register-role]').should('have.value', 'ADMINISTRATOR');
     cy.get('[data-cy=register-submit]').click();
+    cy.contains('Terms and Policy').should('be.visible');
+    cy.get('#policy-check').check({ force: true });
+    cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
     cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
   });
 
@@ -52,7 +55,7 @@ describe('Edit Book - Cancel', () => {
     cy.contains('Edit Book').should('be.visible');
     cy.get('.dialog textarea').clear().type(newDescription);
     cy.get('.dialog button[type="button"]').contains('Cancel').click();
-    cy.contains('Edit Book').should('not.exist');
+    cy.get('.dialog').should('not.exist');
     cy.contains('.book-title', bookTitle)
       .parents('.book-card')
       .find('.book-description')
