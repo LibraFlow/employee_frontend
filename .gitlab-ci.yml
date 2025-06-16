@@ -40,12 +40,7 @@ test:
 e2e-integration:
   stage: test
   image: node:18
-  before_script:
-    # Check if Docker is running (Windows-specific)
-    - if (!(Test-Path "//./pipe/docker_engine")) { Write-Host "Docker Desktop is not running. Will try to use locally running services." }
   script:
-    # Try to use Docker if available, otherwise assume services are running locally
-    - if (Test-Path "//./pipe/docker_engine") { docker-compose -f docker-compose.e2e.yml up -d }
     - cd employee_frontend
     - npm install
     - npx wait-on http://localhost:3001

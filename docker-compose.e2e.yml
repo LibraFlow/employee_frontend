@@ -1,42 +1,57 @@
 version: '3.8'
 services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
+  zookeeper:
+    image: bitnami/zookeeper:3.8
+    container_name: zookeeper
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  kafka:
+    image: bitnami/kafka:3.5
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
 
   book-server:
-    image: registry.gitlab.com/i459452/LibraFlow_Book_Server:latest
+    image: book_server:latest
     ports:
       - "8081:8081"
     depends_on:
-      - rabbitmq
+      - kafka
 
   bookunit-server:
-    image: registry.gitlab.com/i459452/LibraFlow_BookUnit_Server:latest
+    image: bookunit_server:latest
     ports:
       - "8082:8082"
     depends_on:
-      - rabbitmq
+      - kafka
 
   user-server:
-    image: registry.gitlab.com/i459452/LibraFlow_User_Server:latest
+    image: user_server:latest
     ports:
       - "8083:8083"
     depends_on:
-      - rabbitmq
+      - kafka
 
   borrowing-server:
-    image: registry.gitlab.com/i459452/LibraFlow_Borrowing_Server:latest
+    image: borrowing_server:latest
     ports:
       - "8084:8084"
     depends_on:
-      - rabbitmq
+      - kafka
 
   api-gateway:
-    image: registry.gitlab.com/i459452/LibraFlow_API_Gateway:latest
+    image: api_gateway:latest
     ports:
       - "3000:3000"
     depends_on:
@@ -44,11 +59,11 @@ services:
       - bookunit-server
       - user-server
       - borrowing-server
-      - rabbitmq
+      - kafka
 
-  employee-frontend:
-    build: ./employee_frontend
-    ports:
-      - "3001:3001"
-    depends_on:
-      - api-gateway
+#  employee-frontend:
+#    build: ./employee_frontend
+#    ports:
+#      - "3001:3001"
+#    depends_on:
+#      - api-gateway
