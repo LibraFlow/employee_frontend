@@ -43,13 +43,7 @@ e2e-integration:
   before_script:
     # Check if Docker is running (Windows-specific)
     - if (!(Test-Path "//./pipe/docker_engine")) { throw "Docker Desktop is not running. Please start Docker Desktop and try again." }
-    - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin registry.gitlab.com
   script:
-    - docker pull registry.gitlab.com/i459452/LibraFlow_Book_Server:latest
-    - docker pull registry.gitlab.com/i459452/LibraFlow_BookUnit_Server:latest
-    - docker pull registry.gitlab.com/i459452/LibraFlow_User_Server:latest
-    - docker pull registry.gitlab.com/i459452/LibraFlow_Borrowing_Server:latest
-    - docker pull registry.gitlab.com/i459452/LibraFlow_API_Gateway:latest
     - docker-compose -f docker-compose.e2e.yml up -d
     - npx wait-on http://localhost:3001
     - npx cypress run
