@@ -92,7 +92,16 @@ services:
     image: starcraftfan/user-service:latest
     ports:
       - "8083:8083"
-    # Add any required env vars
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db5:5432/db5
+      - SPRING_DATASOURCE_USERNAME=user5
+      - SPRING_DATASOURCE_PASSWORD=password5
+      - JWT_SECRET=12345678901234567890123456789012
+      - KEYPART_ONE=wRJoqINwixKE9UwbjAO+wg==
+      - KEYPART_TWO=/c2hupbW+7wgghMUKqg7mg==
+      - ENCRYPTION_KEY=5WvoJZzv2iJDZo2Asn+VYib2+2WLrnLGpLZSJXs2EmA=
+    depends_on:
+      - db5
 
   api-gateway:
     image: starcraftfan/api-gateway:latest
