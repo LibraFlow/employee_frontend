@@ -22,48 +22,100 @@ services:
     depends_on:
       - zookeeper
 
-  book-server:
-    image: book_server:latest
+  db3:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user3
+      POSTGRES_PASSWORD: password3
+      POSTGRES_DB: db3
     ports:
-      - "8081:8081"
-    depends_on:
-      - kafka
+      - "5434:5432"
+    volumes:
+      - db3-data:/var/lib/postgresql/data
 
-  bookunit-server:
-    image: bookunit_server:latest
+  db4:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user4
+      POSTGRES_PASSWORD: password4
+      POSTGRES_DB: db4
+    ports:
+      - "5435:5432"
+    volumes:
+      - db4-data:/var/lib/postgresql/data
+
+  db5:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user5
+      POSTGRES_PASSWORD: password5
+      POSTGRES_DB: db5
+    ports:
+      - "5436:5432"
+    volumes:
+      - db5-data:/var/lib/postgresql/data
+
+  book-service:
+    image: starcraftfan/book-service:latest
     ports:
       - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db3:5432/db3
+      - SPRING_DATASOURCE_USERNAME=user3
+      - SPRING_DATASOURCE_PASSWORD=password3
     depends_on:
-      - kafka
+      - db3
 
-  user-server:
-    image: user_server:latest
+  bookunit-service:
+    image: starcraftfan/bookunit-service:latest
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db4:5432/db4
+      - SPRING_DATASOURCE_USERNAME=user4
+      - SPRING_DATASOURCE_PASSWORD=password4
+    depends_on:
+      - db4
+
+  borrowing-service:
+    image: starcraftfan/borrowing-service:latest
+    ports:
+      - "8086:8086"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db5:5432/db5
+      - SPRING_DATASOURCE_USERNAME=user5
+      - SPRING_DATASOURCE_PASSWORD=password5
+    depends_on:
+      - db5
+
+  user-service:
+    image: starcraftfan/user-service:latest
     ports:
       - "8083:8083"
-    depends_on:
-      - kafka
-
-  borrowing-server:
-    image: borrowing_server:latest
-    ports:
-      - "8084:8084"
-    depends_on:
-      - kafka
+    # Add any required env vars
 
   api-gateway:
-    image: api_gateway:latest
+    image: starcraftfan/api-gateway:latest
     ports:
       - "3000:3000"
     depends_on:
-      - book-server
-      - bookunit-server
-      - user-server
-      - borrowing-server
-      - kafka
+      - book-service
+      - bookunit-service
+      - borrowing-service
+      - user-service
 
-#  employee-frontend:
-#    build: ./employee_frontend
-#    ports:
-#      - "3001:3001"
-#    depends_on:
-#      - api-gateway
+  employee-frontend:
+    build:
+      context: ./employee_frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+    depends_on:
+      - api-gateway
+
+volumes:
+  db3-data:
+  db4-data:
+  db5-data:

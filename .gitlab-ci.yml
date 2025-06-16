@@ -39,12 +39,22 @@ test:
 
 e2e-integration:
   stage: test
-  image: node:18
+  image: cypress/included:12.17.4
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+  before_script:
+    - apk add --no-cache docker-compose
+    - docker info
+    - docker-compose -f docker-compose.e2e.yml up -d --build
+    - npx wait-on http://localhost:3001
   script:
     - cd employee_frontend
-    - npm install
-    - npx wait-on http://localhost:3001
     - npx cypress run
+  after_script:
+    - docker-compose -f docker-compose.e2e.yml down
   only:
     - main
     - develop
