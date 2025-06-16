@@ -17,7 +17,7 @@ services:
       - KAFKA_BROKER_ID=1
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
@@ -63,6 +63,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db3:5432/db3
       - SPRING_DATASOURCE_USERNAME=user3
       - SPRING_DATASOURCE_PASSWORD=password3
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - db3
 
@@ -74,6 +75,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db4:5432/db4
       - SPRING_DATASOURCE_USERNAME=user4
       - SPRING_DATASOURCE_PASSWORD=password4
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - db4
 
@@ -85,6 +87,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db5:5432/db5
       - SPRING_DATASOURCE_USERNAME=user5
       - SPRING_DATASOURCE_PASSWORD=password5
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - db5
 
@@ -100,6 +103,7 @@ services:
       - KEYPART_ONE=wRJoqINwixKE9UwbjAO+wg==
       - KEYPART_TWO=/c2hupbW+7wgghMUKqg7mg==
       - ENCRYPTION_KEY=5WvoJZzv2iJDZo2Asn+VYib2+2WLrnLGpLZSJXs2EmA=
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - db5
 
