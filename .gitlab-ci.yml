@@ -33,9 +33,8 @@ test:
 e2e-integration:
   stage: test
   script:
-    # Start all services for E2E (ensure docker-compose is in PATH)
     - docker-compose -f docker-compose.e2e.yml up -d --build
-    # Wait for frontend to be up (use PowerShell's curl)
+    # Wait for frontend
     - |
       $maxAttempts = 30
       $attempt = 0
@@ -47,10 +46,23 @@ e2e-integration:
         } catch { }
         Start-Sleep -Seconds 5
       }
+    # Wait for API Gateway
+    - |
+      $maxAttempts = 30
+      $attempt = 0
+      while ($attempt -lt $maxAttempts) {
+        $attempt++
+        try {
+          $response = Invoke-WebRequest -Uri "http://localhost:3000/health" -UseBasicParsing -TimeoutSec 2
+          if ($response.StatusCode -eq 200) { break }
+        } catch { }
+        Start-Sleep -Seconds 5
+      }
     - cd employee_frontend
     - npm install
     - npx cypress run
   after_script:
+    - docker-compose -f docker-compose.e2e.yml logs
     - docker-compose -f docker-compose.e2e.yml down
   only:
     - main
