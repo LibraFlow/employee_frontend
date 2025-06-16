@@ -39,13 +39,10 @@ test:
 
 e2e-integration:
   stage: test
-  image: docker:latest
-  services:
-    - docker:dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375/
-    DOCKER_TLS_CERTDIR: ""
+  image: node:18
   before_script:
+    # Check if Docker is running (Windows-specific)
+    - if (!(Test-Path "//./pipe/docker_engine")) { throw "Docker Desktop is not running. Please start Docker Desktop and try again." }
     - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin registry.gitlab.com
   script:
     - docker pull registry.gitlab.com/i459452/LibraFlow_Book_Server:latest
