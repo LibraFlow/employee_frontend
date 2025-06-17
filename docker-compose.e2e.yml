@@ -94,7 +94,7 @@ services:
   user-service:
     image: starcraftfan/user-service:latest
     ports:
-      - "8083:8083"
+      - "8087:8087"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db5:5432/db5
       - SPRING_DATASOURCE_USERNAME=user5
