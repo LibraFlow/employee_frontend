@@ -2,6 +2,7 @@ image: node:18
 
 stages:
   - build
+  - quality
   - test
 
 build:
@@ -14,6 +15,30 @@ build:
     paths:
       - build/
     expire_in: 1 week
+  only:
+    - main
+    - develop
+    - merge_requests
+
+quality:
+  stage: quality
+  script:
+    - cd employee_frontend
+    - npm install
+    # Run ESLint for code quality checks
+    - npm run lint
+    # Run ESLint with --fix to automatically fix issues where possible
+    - npm run lint:fix
+    # Check for unused dependencies
+    - npm run check-deps
+    # Run security audit
+    - npm audit --audit-level=moderate
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - employee_frontend/eslint-report.json
+  allow_failure: true
   only:
     - main
     - develop
