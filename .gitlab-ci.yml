@@ -25,8 +25,8 @@ quality:
   script:
     - cd employee_frontend
     - npm install
-    # Run ESLint for code quality checks
-    - npm run lint
+    # Run ESLint for code quality checks and generate report
+    - npm run lint -- --output-file eslint-report.json --format json
     # Run ESLint with --fix to automatically fix issues where possible
     - npm run lint:fix
     # Run security audit
