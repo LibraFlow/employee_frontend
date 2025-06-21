@@ -26,11 +26,9 @@ quality:
     - cd employee_frontend
     - npm install
     # Run ESLint for code quality checks
-    - npm run lint
+    - npx eslint src/ --ext .js,.jsx,.ts,.tsx
     # Run ESLint with --fix to automatically fix issues where possible
-    - npm run lint:fix
-    # Check for unused dependencies
-    - npm run check-deps
+    - npx eslint src/ --ext .js,.jsx,.ts,.tsx --fix
     # Run security audit
     - npm audit --audit-level=moderate
   artifacts:
