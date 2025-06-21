@@ -25,8 +25,10 @@ quality:
   script:
     - cd employee_frontend
     - npm install
-    # Run ESLint for code quality checks and generate report
+    # Run ESLint for code quality checks and generate JSON report
     - npm run lint -- --output-file eslint-report.json --format json
+    # Run ESLint and generate HTML report
+    - npm run lint -- --output-file eslint-report.html --format html
     # Run ESLint with --fix to automatically fix issues where possible
     - npm run lint:fix
     # Run security audit
@@ -36,6 +38,7 @@ quality:
     expire_in: 1 week
     paths:
       - employee_frontend/eslint-report.json
+      - employee_frontend/eslint-report.html
   allow_failure: true
   only:
     - main
