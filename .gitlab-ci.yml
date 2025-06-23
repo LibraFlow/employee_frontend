@@ -25,9 +25,7 @@ quality:
   script:
     - cd employee_frontend
     - npm install
-    # Run ESLint for code quality checks and generate JSON report
-    - npm run lint -- --output-file eslint-report.json --format json
-    # Run ESLint and generate HTML report
+    # Run ESLint for code quality checks and generate report
     - npm run lint -- --output-file eslint-report.html --format html
     # Run ESLint with --fix to automatically fix issues where possible
     - npm run lint:fix
@@ -37,7 +35,6 @@ quality:
     when: always
     expire_in: 1 week
     paths:
-      - employee_frontend/eslint-report.json
       - employee_frontend/eslint-report.html
   allow_failure: true
   only:
@@ -56,7 +53,7 @@ test:
     - develop
     - merge_requests
 
-e2e-group1:
+e2e-integration:
   stage: test
   script:
     - docker-compose -f docker-compose.e2e.yml up -d --build
@@ -70,7 +67,7 @@ e2e-group1:
           $response = Invoke-WebRequest -Uri "http://localhost:3001" -UseBasicParsing -TimeoutSec 2
           if ($response.StatusCode -eq 200) { break }
         } catch { }
-        Start-Sleep -Seconds 10
+        Start-Sleep -Seconds 5
       }
     # Wait for API Gateway
     - |
@@ -82,93 +79,13 @@ e2e-group1:
           $response = Invoke-WebRequest -Uri "http://localhost:3000/health" -UseBasicParsing -TimeoutSec 2
           if ($response.StatusCode -eq 200) { break }
         } catch { }
-        Start-Sleep -Seconds 10
+        Start-Sleep -Seconds 5
       }
     # Additional wait to ensure services are fully stable
     - Start-Sleep -Seconds 30
     - cd employee_frontend
     - npm install
-    - npx cypress run --spec "cypress/e2e/group1/**/*.cy.js"
-  after_script:
-    - docker-compose -f docker-compose.e2e.yml down
-  only:
-    - main
-    - develop
-    - merge_requests
-
-e2e-group2:
-  stage: test
-  script:
-    - docker-compose -f docker-compose.e2e.yml up -d --build
-    # Wait for frontend
-    - |
-      $maxAttempts = 30
-      $attempt = 0
-      while ($attempt -lt $maxAttempts) {
-        $attempt++
-        try {
-          $response = Invoke-WebRequest -Uri "http://localhost:3001" -UseBasicParsing -TimeoutSec 2
-          if ($response.StatusCode -eq 200) { break }
-        } catch { }
-        Start-Sleep -Seconds 10
-      }
-    # Wait for API Gateway
-    - |
-      $maxAttempts = 30
-      $attempt = 0
-      while ($attempt -lt $maxAttempts) {
-        $attempt++
-        try {
-          $response = Invoke-WebRequest -Uri "http://localhost:3000/health" -UseBasicParsing -TimeoutSec 2
-          if ($response.StatusCode -eq 200) { break }
-        } catch { }
-        Start-Sleep -Seconds 10
-      }
-    # Additional wait to ensure services are fully stable
-    - Start-Sleep -Seconds 30
-    - cd employee_frontend
-    - npm install
-    - npx cypress run --spec "cypress/e2e/group2/**/*.cy.js"
-  after_script:
-    - docker-compose -f docker-compose.e2e.yml down
-  only:
-    - main
-    - develop
-    - merge_requests
-
-e2e-group3:
-  stage: test
-  script:
-    - docker-compose -f docker-compose.e2e.yml up -d --build
-    # Wait for frontend
-    - |
-      $maxAttempts = 30
-      $attempt = 0
-      while ($attempt -lt $maxAttempts) {
-        $attempt++
-        try {
-          $response = Invoke-WebRequest -Uri "http://localhost:3001" -UseBasicParsing -TimeoutSec 2
-          if ($response.StatusCode -eq 200) { break }
-        } catch { }
-        Start-Sleep -Seconds 10
-      }
-    # Wait for API Gateway
-    - |
-      $maxAttempts = 30
-      $attempt = 0
-      while ($attempt -lt $maxAttempts) {
-        $attempt++
-        try {
-          $response = Invoke-WebRequest -Uri "http://localhost:3000/health" -UseBasicParsing -TimeoutSec 2
-          if ($response.StatusCode -eq 200) { break }
-        } catch { }
-        Start-Sleep -Seconds 10
-      }
-    # Additional wait to ensure services are fully stable
-    - Start-Sleep -Seconds 30
-    - cd employee_frontend
-    - npm install
-    - npx cypress run --spec "cypress/e2e/group3/**/*.cy.js"
+    - npx cypress run
   after_script:
     - docker-compose -f docker-compose.e2e.yml down
   only:
