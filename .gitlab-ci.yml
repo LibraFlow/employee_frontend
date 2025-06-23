@@ -60,53 +60,35 @@ e2e-integration:
   stage: test
   script:
     - docker-compose -f docker-compose.e2e.yml up -d --build
-    # Wait for all services to be ready with better health checks
+    # Wait for frontend
     - |
-      Write-Host "Waiting for all services to be ready..."
-      $services = @(
-        @{Name="Frontend"; Url="http://localhost:3001"; ExpectedStatus=200},
-        @{Name="API Gateway"; Url="http://localhost:3000/health"; ExpectedStatus=200},
-        @{Name="Book Service"; Url="http://localhost:8082/actuator/health"; ExpectedStatus=200},
-        @{Name="BookUnit Service"; Url="http://localhost:8085/actuator/health"; ExpectedStatus=200},
-        @{Name="Borrowing Service"; Url="http://localhost:8086/actuator/health"; ExpectedStatus=200},
-        @{Name="User Service"; Url="http://localhost:8087/actuator/health"; ExpectedStatus=200}
-      )
-      
-      foreach ($service in $services) {
-        $maxAttempts = 60
-        $attempt = 0
-        $ready = $false
-        
-        Write-Host "Checking $($service.Name)..."
-        while ($attempt -lt $maxAttempts -and -not $ready) {
-          $attempt++
-          try {
-            $response = Invoke-WebRequest -Uri $service.Url -UseBasicParsing -TimeoutSec 5
-            if ($response.StatusCode -eq $service.ExpectedStatus) {
-              Write-Host "$($service.Name) is ready after $attempt attempts"
-              $ready = $true
-            }
-          } catch {
-            Write-Host "$($service.Name) not ready yet (attempt $attempt/$maxAttempts)"
-          }
-          if (-not $ready) {
-            Start-Sleep -Seconds 5
-          }
-        }
-        
-        if (-not $ready) {
-          Write-Error "$($service.Name) failed to start after $maxAttempts attempts"
-          exit 1
-        }
+      $maxAttempts = 30
+      $attempt = 0
+      while ($attempt -lt $maxAttempts) {
+        $attempt++
+        try {
+          $response = Invoke-WebRequest -Uri "http://localhost:3001" -UseBasicParsing -TimeoutSec 2
+          if ($response.StatusCode -eq 200) { break }
+        } catch { }
+        Start-Sleep -Seconds 10
       }
-      
-      Write-Host "All services are ready!"
-      # Additional wait to ensure services are fully initialized
-      Start-Sleep -Seconds 10
+    # Wait for API Gateway
+    - |
+      $maxAttempts = 30
+      $attempt = 0
+      while ($attempt -lt $maxAttempts) {
+        $attempt++
+        try {
+          $response = Invoke-WebRequest -Uri "http://localhost:3000/health" -UseBasicParsing -TimeoutSec 2
+          if ($response.StatusCode -eq 200) { break }
+        } catch { }
+        Start-Sleep -Seconds 10
+      }
+    # Additional wait to ensure services are fully stable
+    - Start-Sleep -Seconds 30
     - cd employee_frontend
     - npm install
-    # Run Cypress with retry logic and better configuration
-    - npx cypress run --retries 2 --config defaultCommandTimeout=15000,requestTimeout=15000,responseTimeout=15000
+    - npx cypress run
   after_script:
     - docker-compose -f docker-compose.e2e.yml down
   only:
