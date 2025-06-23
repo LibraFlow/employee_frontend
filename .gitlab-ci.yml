@@ -56,7 +56,7 @@ test:
     - develop
     - merge_requests
 
-e2e-integration-1:
+e2e-group1:
   stage: test
   script:
     - docker-compose -f docker-compose.e2e.yml up -d --build
@@ -88,7 +88,7 @@ e2e-integration-1:
     - Start-Sleep -Seconds 30
     - cd employee_frontend
     - npm install
-    - npx cypress run --spec "cypress/e2e/add-book-unit-cancel.cy.js,cypress/e2e/add-book-unit-invalid.cy.js,cypress/e2e/add-book-unit.cy.js,cypress/e2e/add-new-book-cancel.cy.js,cypress/e2e/add-new-book-invalid.cy.js,cypress/e2e/add-new-book.cy.js,cypress/e2e/back-button.cy.js,cypress/e2e/delete-book-cancel.cy.js,cypress/e2e/delete-book-unit-cancel.cy.js,cypress/e2e/delete-book-unit.cy.js,cypress/e2e/delete-book.cy.js,cypress/e2e/edit-book-cancel.cy.js"
+    - npx cypress run --spec "cypress/e2e/group1/**/*.cy.js"
   after_script:
     - docker-compose -f docker-compose.e2e.yml down
   only:
@@ -96,7 +96,7 @@ e2e-integration-1:
     - develop
     - merge_requests
 
-e2e-integration-2:
+e2e-group2:
   stage: test
   script:
     - docker-compose -f docker-compose.e2e.yml up -d --build
@@ -128,7 +128,7 @@ e2e-integration-2:
     - Start-Sleep -Seconds 30
     - cd employee_frontend
     - npm install
-    - npx cypress run --spec "cypress/e2e/edit-book-invalid.cy.js,cypress/e2e/edit-book-unit-cancel.cy.js,cypress/e2e/edit-book-unit-invalid.cy.js,cypress/e2e/edit-book-unit.cy.js,cypress/e2e/edit-book.cy.js,cypress/e2e/logout.cy.js,cypress/e2e/overdue-unavailable-units.cy.js,cypress/e2e/profile-cancel-edit.cy.js,cypress/e2e/profile-cancel-export.cy.js,cypress/e2e/profile-delete.cy.js,cypress/e2e/profile-edit.cy.js,cypress/e2e/profile-export.cy.js,cypress/e2e/register-and-login.cy.js"
+    - npx cypress run --spec "cypress/e2e/group2/**/*.cy.js"
   after_script:
     - docker-compose -f docker-compose.e2e.yml down
   only:
