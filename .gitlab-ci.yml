@@ -56,7 +56,7 @@ test:
     - develop
     - merge_requests
 
-e2e-integration:
+e2e-integration-1:
   stage: test
   script:
     - docker-compose -f docker-compose.e2e.yml up -d --build
@@ -88,7 +88,47 @@ e2e-integration:
     - Start-Sleep -Seconds 30
     - cd employee_frontend
     - npm install
-    - npx cypress run
+    - npx cypress run --spec "cypress/e2e/add-book-unit-cancel.cy.js,cypress/e2e/add-book-unit-invalid.cy.js,cypress/e2e/add-book-unit.cy.js,cypress/e2e/add-new-book-cancel.cy.js,cypress/e2e/add-new-book-invalid.cy.js,cypress/e2e/add-new-book.cy.js,cypress/e2e/back-button.cy.js,cypress/e2e/delete-book-cancel.cy.js,cypress/e2e/delete-book-unit-cancel.cy.js,cypress/e2e/delete-book-unit.cy.js,cypress/e2e/delete-book.cy.js,cypress/e2e/edit-book-cancel.cy.js"
+  after_script:
+    - docker-compose -f docker-compose.e2e.yml down
+  only:
+    - main
+    - develop
+    - merge_requests
+
+e2e-integration-2:
+  stage: test
+  script:
+    - docker-compose -f docker-compose.e2e.yml up -d --build
+    # Wait for frontend
+    - |
+      $maxAttempts = 30
+      $attempt = 0
+      while ($attempt -lt $maxAttempts) {
+        $attempt++
+        try {
+          $response = Invoke-WebRequest -Uri "http://localhost:3001" -UseBasicParsing -TimeoutSec 2
+          if ($response.StatusCode -eq 200) { break }
+        } catch { }
+        Start-Sleep -Seconds 10
+      }
+    # Wait for API Gateway
+    - |
+      $maxAttempts = 30
+      $attempt = 0
+      while ($attempt -lt $maxAttempts) {
+        $attempt++
+        try {
+          $response = Invoke-WebRequest -Uri "http://localhost:3000/health" -UseBasicParsing -TimeoutSec 2
+          if ($response.StatusCode -eq 200) { break }
+        } catch { }
+        Start-Sleep -Seconds 10
+      }
+    # Additional wait to ensure services are fully stable
+    - Start-Sleep -Seconds 30
+    - cd employee_frontend
+    - npm install
+    - npx cypress run --spec "cypress/e2e/edit-book-invalid.cy.js,cypress/e2e/edit-book-unit-cancel.cy.js,cypress/e2e/edit-book-unit-invalid.cy.js,cypress/e2e/edit-book-unit.cy.js,cypress/e2e/edit-book.cy.js,cypress/e2e/logout.cy.js,cypress/e2e/overdue-unavailable-units.cy.js,cypress/e2e/profile-cancel-edit.cy.js,cypress/e2e/profile-cancel-export.cy.js,cypress/e2e/profile-delete.cy.js,cypress/e2e/profile-edit.cy.js,cypress/e2e/profile-export.cy.js,cypress/e2e/register-and-login.cy.js"
   after_script:
     - docker-compose -f docker-compose.e2e.yml down
   only:
