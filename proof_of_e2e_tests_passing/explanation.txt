@@ -1,0 +1,1 @@
+A screenshot which shows the same e2e tests passed at the beginning of Sunday. From link https://git.fhict.nl/I459452/libraflow_employee_frontend/-/commit/af368d99072d73e0b52b685885a08dbdcd50d0eb/pipelines?ref=main
