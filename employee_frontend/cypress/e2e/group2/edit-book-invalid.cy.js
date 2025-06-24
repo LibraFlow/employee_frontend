@@ -22,7 +22,7 @@ describe('Edit Book - Invalid Input', () => {
     cy.contains('Terms and Policy').should('be.visible');
     cy.get('#policy-check').check({ force: true });
     cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
-    cy.get('[data-cy=register-success]', { timeout: 30000 }).should('be.visible');
+    cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
   });
 
   beforeEach(() => {
@@ -30,37 +30,30 @@ describe('Edit Book - Invalid Input', () => {
   });
 
   it('should add a new book to edit', () => {
-    cy.navigateToGenre('Fantasy');
-    
-    const bookData = {
-      title: bookTitle,
-      author: 'Cypress Author',
-      year: '2024',
-      description: 'This is a test book added by Cypress.'
-    };
-    
-    cy.addBookReliably(bookData);
+    cy.contains('Genres').click();
+    cy.contains('.genre-card', 'Fantasy').click();
+    cy.contains('button', 'Add Book').click();
+    cy.contains('Add New Book').should('be.visible');
+    cy.get('select').should('have.value', 'Fantasy');
+    cy.get('.dialog input[type="text"]').eq(0).type(bookTitle);
+    cy.get('.dialog input[type="text"]').eq(1).type('Cypress Author');
+    cy.get('.dialog input[type="number"]').type('2024');
+    cy.get('.dialog textarea').type('This is a test book added by Cypress.');
+    cy.get('.dialog button[type="submit"]').contains('Add Book').click();
+    cy.contains('.book-title', bookTitle).should('be.visible');
   });
 
   it('should show an error if the edited title is too long', () => {
-    cy.navigateToGenre('Fantasy');
-    
-    // Click edit button for the specific book
+    cy.contains('Genres').click();
+    cy.contains('.genre-card', 'Fantasy').click();
     cy.contains('.book-title', bookTitle)
-      .closest('.book-card')
-      .within(() => {
-        cy.get('.edit-button').click();
-      });
-    
-    // Wait for edit dialog and try to enter invalid data
-    cy.waitForDialog();
-    cy.get('.dialog').within(() => {
-      const longTitle = 'A'.repeat(41);
-      cy.get('input[type="text"]').eq(0).clear().type(longTitle);
-      cy.get('button[type="submit"]').contains('Save Changes').click();
-    });
-    
-    // Verify error message appears and dialog stays open
+      .parents('.book-card')
+      .find('.edit-button')
+      .click();
+    cy.contains('Edit Book').should('be.visible');
+    const longTitle = 'A'.repeat(41);
+    cy.get('.dialog input[type="text"]').eq(0).clear().type(longTitle);
+    cy.get('.dialog button[type="submit"]').contains('Save Changes').click();
     cy.get('[data-cy=edit-book-error]').should('be.visible').and('contain', 'Title is too long');
     cy.get('.dialog').should('be.visible');
     cy.contains('.book-title', longTitle).should('not.exist');

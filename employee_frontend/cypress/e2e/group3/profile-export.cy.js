@@ -17,9 +17,9 @@ describe('Profile Export Data', () => {
     cy.window().then((win) => {
       cy.stub(win.URL, 'createObjectURL').returns('blob:fake-url');
     });
-    cy.contains('Export My Data').should('be.visible').click();
+    cy.contains('Export My Data').click();
     cy.contains('Do you want to export your data?').should('be.visible');
-    cy.contains('Yes, Export').should('be.visible').click();
+    cy.contains('Yes, Export').click();
     cy.contains('Do you want to export your data?').should('not.exist');
   });
 }); 

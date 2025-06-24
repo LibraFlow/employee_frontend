@@ -29,7 +29,7 @@ describe('Add Book Unit - Cancel', () => {
     cy.contains('Terms and Policy').should('be.visible');
     cy.get('#policy-check').check({ force: true });
     cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
-    cy.get('[data-cy=register-success]', { timeout: 30000 }).should('be.visible');
+    cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
   });
 
   beforeEach(() => {
@@ -38,40 +38,34 @@ describe('Add Book Unit - Cancel', () => {
 
   it('should open the add book unit dialog and cancel', () => {
     // Add a new book
-    cy.navigateToGenre('Fantasy');
-    
-    const bookData = {
-      title: bookTitle,
-      author: 'Cypress Author',
-      year: '2024',
-      description: 'Book for unit cancel test.'
-    };
-    
-    cy.addBookReliably(bookData);
+    cy.contains('Genres').click();
+    cy.contains('.genre-card', 'Fantasy').click();
+    cy.contains('button', 'Add Book').click();
+    cy.contains('Add New Book').should('be.visible');
+    cy.get('.dialog input[type="text"]').eq(0).type(bookTitle);
+    cy.get('.dialog input[type="text"]').eq(1).type('Cypress Author');
+    cy.get('.dialog input[type="number"]').type('2024');
+    cy.get('.dialog textarea').type('Book for unit cancel test.');
+    cy.get('.dialog button[type="submit"]').contains('Add Book').click();
+    cy.contains('.book-title', bookTitle).should('be.visible');
 
     // Go to the book's units page
     cy.contains('.book-title', bookTitle)
-      .closest('.book-card')
-      .within(() => {
-        cy.get('.units-button').click();
-      });
+      .parents('.book-card')
+      .find('.units-button')
+      .click();
     cy.contains('Book Units').should('be.visible');
 
     // Start to add a new book unit, but cancel
     cy.contains('button', 'Add Unit').click();
-    cy.waitForDialog();
-    
-    cy.get('.dialog').within(() => {
-      cy.get('input').eq(0).type(unitData.language);
-      cy.get('input').eq(1).type(unitData.pageCount);
-      cy.get('input').eq(2).type(unitData.coverImageLink);
-      cy.get('input').eq(3).type(unitData.publisher);
-      cy.get('input').eq(4).type(unitData.isbn);
-      cy.get('button[type="button"]').contains('Cancel').click();
-    });
-    
-    // Verify dialog closed and unit was not added
-    cy.waitForElementToDisappear('.dialog');
+    cy.contains('Add New Book Unit').should('be.visible');
+    cy.get('.dialog input').eq(0).type(unitData.language);
+    cy.get('.dialog input').eq(1).type(unitData.pageCount);
+    cy.get('.dialog input').eq(2).type(unitData.coverImageLink);
+    cy.get('.dialog input').eq(3).type(unitData.publisher);
+    cy.get('.dialog input').eq(4).type(unitData.isbn);
+    cy.get('.dialog button[type="button"]').contains('Cancel').click();
+    cy.contains('Add New Book Unit').should('not.exist');
     cy.contains('.unit-card', unitData.language).should('not.exist');
     cy.contains('.unit-card', unitData.publisher).should('not.exist');
     cy.contains('.unit-card', unitData.isbn).should('not.exist');

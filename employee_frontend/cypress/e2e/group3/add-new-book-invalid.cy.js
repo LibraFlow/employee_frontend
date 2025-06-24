@@ -22,7 +22,7 @@ describe('Add New Book - Invalid Input', () => {
     cy.contains('Terms and Policy').should('be.visible');
     cy.get('#policy-check').check({ force: true });
     cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
-    cy.get('[data-cy=register-success]', { timeout: 30000 }).should('be.visible');
+    cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
   });
 
   beforeEach(() => {
@@ -30,28 +30,21 @@ describe('Add New Book - Invalid Input', () => {
     cy.get('[data-cy=username-input]').type(testUser.username);
     cy.get('[data-cy=password-input]').type(testUser.password);
     cy.get('[data-cy=login-button]').click();
-    cy.contains('Welcome to LibraFlow!', { timeout: 20000 }).should('be.visible');
+    cy.contains('Welcome to LibraFlow!').should('be.visible');
   });
 
   it('should show an error if the title is too long', () => {
-    cy.navigateToGenre('Fantasy');
-    
-    // Click Add Book button
+    cy.contains('Genres').click();
+    cy.contains('.genre-card', 'Fantasy').click();
     cy.contains('button', 'Add Book').click();
-    cy.waitForDialog();
-    
-    // Fill form with invalid data
+    cy.contains('Add New Book').should('be.visible');
     const longTitle = 'A'.repeat(41);
-    cy.get('.dialog').within(() => {
-      cy.get('input').eq(0).type(longTitle); // Title
-      cy.get('input').eq(1).type('Cypress Author'); // Author
-      cy.get('input[type="number"]').type('2024'); // Year
-      cy.get('select').select('Fantasy');
-      cy.get('textarea').type('This is a test book with an invalid title.');
-      cy.get('button[type="submit"]').contains('Add Book').click();
-    });
-    
-    // Verify error message appears and dialog stays open
+    cy.get('input').eq(0).type(longTitle); // Title
+    cy.get('input').eq(1).type('Cypress Author'); // Author
+    cy.get('input[type="number"]').type('2024'); // Year
+    cy.get('select').select('Fantasy');
+    cy.get('textarea').type('This is a test book with an invalid title.');
+    cy.get('button[type="submit"]').contains('Add Book').click();
     cy.get('[data-cy=add-book-error]').should('be.visible').and('contain', 'Title is too long');
     cy.get('.dialog').should('be.visible');
     cy.contains('.book-title', longTitle).should('not.exist');

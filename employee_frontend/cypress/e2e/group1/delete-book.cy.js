@@ -22,7 +22,7 @@ describe('Book Management - Delete Book', () => {
     cy.contains('Terms and Policy').should('be.visible');
     cy.get('#policy-check').check({ force: true });
     cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
-    cy.get('[data-cy=register-success]', { timeout: 30000 }).should('be.visible');
+    cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
   });
 
   beforeEach(() => {
@@ -30,43 +30,41 @@ describe('Book Management - Delete Book', () => {
   });
 
   it('should navigate to the genres page', () => {
-    cy.navigateToGenre('Fantasy');
+    cy.contains('Genres').click();
+    cy.url().should('include', '/genres');
     cy.contains('Browse by Genre').should('be.visible');
     cy.get('.genre-card').should('have.length.greaterThan', 0);
   });
 
   it('should open the Fantasy genre page', () => {
-    cy.navigateToGenre('Fantasy');
+    cy.contains('Genres').click();
+    cy.contains('.genre-card', 'Fantasy').click();
+    cy.url().should('include', '/genres/Fantasy');
     cy.contains('Fantasy Books').should('be.visible');
   });
 
   it('should add a new book to the Fantasy genre', () => {
-    cy.navigateToGenre('Fantasy');
-    
-    const bookData = {
-      title: bookTitle,
-      author: 'Cypress Author',
-      year: '2024',
-      description: 'This is a test book added by Cypress.'
-    };
-    
-    cy.addBookReliably(bookData);
+    cy.contains('Genres').click();
+    cy.contains('.genre-card', 'Fantasy').click();
+    cy.contains('button', 'Add Book').click();
+    cy.contains('Add New Book').should('be.visible');
+    cy.get('select').should('have.value', 'Fantasy');
+    cy.get('.dialog input[type="text"]').eq(0).type(bookTitle);
+    cy.get('.dialog input[type="text"]').eq(1).type('Cypress Author');
+    cy.get('.dialog input[type="number"]').type('2024');
+    cy.get('.dialog textarea').type('This is a test book added by Cypress.');
+    cy.get('.dialog button[type="submit"]').contains('Add Book').click();
+    cy.contains('.book-title', bookTitle).should('be.visible');
   });
 
   it('should delete the new book and verify it is removed', () => {
-    cy.navigateToGenre('Fantasy');
-    
-    // Use more robust selector for finding and clicking delete button
+    cy.contains('Genres').click();
+    cy.contains('.genre-card', 'Fantasy').click();
     cy.contains('.book-title', bookTitle)
-      .closest('.book-card')
-      .within(() => {
-        cy.get('.delete-button').click();
-      });
-    
-    // Wait for confirmation dialog and click delete
-    cy.contains('button', 'Delete').should('be.visible').click();
-    
-    // Wait for the book to be removed
+      .parents('.book-card')
+      .find('.delete-button')
+      .click();
+    cy.contains('button', 'Delete').click();
     cy.contains('.book-title', bookTitle).should('not.exist');
   });
 }); 
