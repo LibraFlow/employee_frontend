@@ -15,4 +15,8 @@ if (app) {
 }
 
 // Prevent TypeScript from reading file as legacy script
-export {} 
+export {}
+
+afterEach(() => {
+  cy.wait(2000); // Wait 2 seconds after each test
+}); 

@@ -82,7 +82,7 @@ e2e-integration:
         Start-Sleep -Seconds 5
       }
     # Additional wait to ensure services are fully stable
-    - Start-Sleep -Seconds 30
+    - Start-Sleep -Seconds 60
     - cd employee_frontend
     - npm install
     - npx cypress run
