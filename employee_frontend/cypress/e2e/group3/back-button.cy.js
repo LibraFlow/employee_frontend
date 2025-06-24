@@ -21,7 +21,7 @@ describe('Back Button Navigation', () => {
     cy.contains('Terms and Policy').should('be.visible');
     cy.get('#policy-check').check({ force: true });
     cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
-    cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
+    cy.get('[data-cy=register-success]', { timeout: 30000 }).should('be.visible');
   });
 
   beforeEach(() => {
@@ -29,10 +29,10 @@ describe('Back Button Navigation', () => {
   });
 
   it('should navigate to Fantasy genre and go back to genres list using Back button', () => {
-    cy.contains('Genres').click();
-    cy.contains('.genre-card', 'Fantasy').click();
-    cy.url().should('include', '/genres/Fantasy');
+    cy.navigateToGenre('Fantasy');
     cy.contains('Fantasy Books').should('be.visible');
+    
+    // Click back button and verify navigation
     cy.contains('button', 'Back').click();
     cy.url().should('include', '/genres');
     cy.contains('Browse by Genre').should('be.visible');

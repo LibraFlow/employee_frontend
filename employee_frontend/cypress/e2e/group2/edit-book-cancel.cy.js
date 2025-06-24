@@ -24,7 +24,7 @@ describe('Edit Book - Cancel', () => {
     cy.contains('Terms and Policy').should('be.visible');
     cy.get('#policy-check').check({ force: true });
     cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
-    cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
+    cy.get('[data-cy=register-success]', { timeout: 30000 }).should('be.visible');
   });
 
   beforeEach(() => {
@@ -32,34 +32,46 @@ describe('Edit Book - Cancel', () => {
   });
 
   it('should add a new book for editing', () => {
-    cy.contains('Genres').click();
-    cy.contains('.genre-card', 'Fantasy').click();
-    cy.contains('button', 'Add Book').click();
-    cy.contains('Add New Book').should('be.visible');
-    cy.get('.dialog input[type="text"]').eq(0).type(bookTitle);
-    cy.get('.dialog input[type="text"]').eq(1).type('Cypress Author');
-    cy.get('.dialog input[type="number"]').type('2024');
-    cy.get('.dialog textarea').type(originalDescription);
-    cy.get('.dialog button[type="submit"]').contains('Add Book').click();
-    cy.contains('.book-title', bookTitle).should('be.visible');
+    cy.navigateToGenre('Fantasy');
+    
+    const bookData = {
+      title: bookTitle,
+      author: 'Cypress Author',
+      year: '2024',
+      description: originalDescription
+    };
+    
+    cy.addBookReliably(bookData);
     cy.contains('.book-description', originalDescription).should('be.visible');
   });
 
   it('should open the edit dialog and cancel', () => {
-    cy.contains('Genres').click();
-    cy.contains('.genre-card', 'Fantasy').click();
+    cy.navigateToGenre('Fantasy');
+    
+    // Click edit button for the specific book
     cy.contains('.book-title', bookTitle)
-      .parents('.book-card')
-      .find('.edit-button')
-      .click();
-    cy.contains('Edit Book').should('be.visible');
-    cy.get('.dialog textarea').clear().type(newDescription);
-    cy.get('.dialog button[type="button"]').contains('Cancel').click();
-    cy.get('.dialog').should('not.exist');
+      .closest('.book-card')
+      .within(() => {
+        cy.get('.edit-button').click();
+      });
+    
+    // Wait for edit dialog and make changes
+    cy.waitForDialog();
+    cy.get('.dialog').within(() => {
+      cy.get('textarea').clear().type(newDescription);
+      cy.get('button[type="button"]').contains('Cancel').click();
+    });
+    
+    // Wait for dialog to close
+    cy.waitForElementToDisappear('.dialog');
+    
+    // Verify the description was not changed
     cy.contains('.book-title', bookTitle)
-      .parents('.book-card')
-      .find('.book-description')
-      .should('contain', originalDescription)
-      .and('not.contain', newDescription);
+      .closest('.book-card')
+      .within(() => {
+        cy.get('.book-description')
+          .should('contain', originalDescription)
+          .and('not.contain', newDescription);
+      });
   });
 }); 

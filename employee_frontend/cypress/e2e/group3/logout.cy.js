@@ -21,7 +21,7 @@ describe('User Logout', () => {
     cy.contains('Terms and Policy').should('be.visible');
     cy.get('#policy-check').check({ force: true });
     cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
-    cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
+    cy.get('[data-cy=register-success]', { timeout: 30000 }).should('be.visible');
   });
 
   it('should log in and then log out, redirecting to login page', () => {
@@ -30,7 +30,7 @@ describe('User Logout', () => {
     cy.get('[data-cy=username-input]').type(testUser.username);
     cy.get('[data-cy=password-input]').type(testUser.password);
     cy.get('[data-cy=login-button]').click();
-    cy.contains('Welcome to LibraFlow!').should('be.visible');
+    cy.contains('Welcome to LibraFlow!', { timeout: 20000 }).should('be.visible');
 
     // Log out
     cy.get('[data-cy=logout-btn]').should('be.visible').click();

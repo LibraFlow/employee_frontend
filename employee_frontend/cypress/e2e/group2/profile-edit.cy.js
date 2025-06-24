@@ -15,12 +15,17 @@ describe('Profile Edit', () => {
 
   it('allows a user to edit their profile settings', () => {
     cy.contains('Edit Profile').click();
-    cy.get('input[name="username"]').clear().type('updateduser');
-    cy.get('input[name="email"]').clear().type('updateduser@gmail.com');
-    cy.get('input[name="pwd"]').clear().type('NewPass123!');
-    cy.get('input[name="address"]').clear().type('456 Updated Ave');
-    cy.get('input[name="phone"]').clear().type('9876543210');
+    
+    // Wait for form to be ready and fill in updated values
+    cy.get('input[name="username"]').should('be.visible').clear().type('updateduser');
+    cy.get('input[name="email"]').should('be.visible').clear().type('updateduser@gmail.com');
+    cy.get('input[name="pwd"]').should('be.visible').clear().type('NewPass123!');
+    cy.get('input[name="address"]').should('be.visible').clear().type('456 Updated Ave');
+    cy.get('input[name="phone"]').should('be.visible').clear().type('9876543210');
+    
     cy.contains('Save').click();
+    
+    // Wait for success message and verify updates
     cy.contains('Profile updated successfully.').should('be.visible');
     cy.get('input[name="username"]').should('have.value', 'updateduser');
     cy.get('input[name="email"]').should('have.value', 'updateduser@gmail.com');

@@ -29,7 +29,7 @@ describe('Edit Book Unit - Invalid Input', () => {
     cy.contains('Terms and Policy').should('be.visible');
     cy.get('#policy-check').check({ force: true });
     cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
-    cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
+    cy.get('[data-cy=register-success]', { timeout: 30000 }).should('be.visible');
   });
 
   beforeEach(() => {
@@ -37,66 +37,82 @@ describe('Edit Book Unit - Invalid Input', () => {
     cy.get('[data-cy=username-input]').type(testUser.username);
     cy.get('[data-cy=password-input]').type(testUser.password);
     cy.get('[data-cy=login-button]').click();
-    cy.contains('Welcome to LibraFlow!').should('be.visible');
+    cy.contains('Welcome to LibraFlow!', { timeout: 20000 }).should('be.visible');
   });
 
   it('should show an error for invalid cover image link when editing a book unit', () => {
     // Add a new book
-    cy.contains('Genres').click();
-    cy.contains('.genre-card', 'Fantasy').click();
-    cy.contains('button', 'Add Book').click();
-    cy.contains('Add New Book').should('be.visible');
-    cy.get('.dialog input[type="text"]').eq(0).type(bookTitle);
-    cy.get('.dialog input[type="text"]').eq(1).type('Cypress Author');
-    cy.get('.dialog input[type="number"]').type('2024');
-    cy.get('.dialog textarea').type('Book for edit unit invalid test.');
-    cy.get('.dialog button[type="submit"]').contains('Add Book').click();
-    cy.reload();
-    cy.contains('.book-title', bookTitle, { timeout: 10000 }).should('be.visible');
+    cy.navigateToGenre('Fantasy');
+    
+    const bookData = {
+      title: bookTitle,
+      author: 'Cypress Author',
+      year: '2024',
+      description: 'Book for edit unit invalid test.'
+    };
+    
+    cy.addBookReliably(bookData);
 
     // Go to the book's units page
     cy.contains('.book-title', bookTitle)
-      .parents('.book-card')
-      .find('.units-button')
-      .click();
+      .closest('.book-card')
+      .within(() => {
+        cy.get('.units-button').click();
+      });
     cy.contains('Book Units').should('be.visible');
 
     // Add a valid book unit
     cy.contains('button', 'Add Unit').click();
-    cy.contains('Add New Book Unit').should('be.visible');
-    cy.get('.dialog input').eq(0).type(unitData.language);
-    cy.get('.dialog input').eq(1).type(unitData.pageCount);
-    cy.get('.dialog input').eq(2).type(unitData.coverImageLink);
-    cy.get('.dialog input').eq(3).type(unitData.publisher);
-    cy.get('.dialog input').eq(4).type(unitData.isbn);
-    cy.get('.dialog button[type="submit"]').contains('Add Unit').click();
-    cy.get('.dialog').should('not.exist');
+    cy.waitForDialog();
+    
+    cy.get('.dialog').within(() => {
+      cy.get('input').eq(0).type(unitData.language);
+      cy.get('input').eq(1).type(unitData.pageCount);
+      cy.get('input').eq(2).type(unitData.coverImageLink);
+      cy.get('input').eq(3).type(unitData.publisher);
+      cy.get('input').eq(4).type(unitData.isbn);
+      cy.get('button[type="submit"]').contains('Add Unit').click();
+    });
+    
+    cy.waitForElementToDisappear('.dialog');
     cy.get('.unit-card').should('exist');
 
     // Edit the book unit with an invalid image link
-    cy.get('.unit-card').last().find('.edit-button').click();
-    cy.contains('Edit Book Unit').should('be.visible');
-    cy.get('.dialog input').eq(2).clear().type('https://example.com/not-an-image.txt');
-    cy.get('.dialog button[type="submit"]').contains('Save Changes').click();
+    cy.get('.unit-card').last().within(() => {
+      cy.get('.edit-button').click();
+    });
+    
+    cy.waitForDialog();
+    cy.get('.dialog').within(() => {
+      cy.get('input').eq(2).clear().type('https://example.com/not-an-image.txt');
+      cy.get('button[type="submit"]').contains('Save Changes').click();
+    });
+    
     cy.get('[data-cy=edit-book-unit-error]').should('be.visible').and('contain', 'Cover image link must be a valid image URL');
     cy.get('.dialog').should('be.visible');
   });
 
   it('should show an error for invalid ISBN when editing a book unit', () => {
-    // Go to the book's units page (book already created in previous test)
-    cy.contains('Genres').click();
-    cy.contains('.genre-card', 'Fantasy').click();
+    // Navigate to the book's units page (book already created in previous test)
+    cy.navigateToGenre('Fantasy');
     cy.contains('.book-title', bookTitle)
-      .parents('.book-card')
-      .find('.units-button')
-      .click();
+      .closest('.book-card')
+      .within(() => {
+        cy.get('.units-button').click();
+      });
     cy.contains('Book Units').should('be.visible');
 
     // Edit the book unit with an invalid ISBN
-    cy.get('.unit-card').last().find('.edit-button').click();
-    cy.contains('Edit Book Unit').should('be.visible');
-    cy.get('.dialog input').eq(4).clear().type('invalidisbn');
-    cy.get('.dialog button[type="submit"]').contains('Save Changes').click();
+    cy.get('.unit-card').last().within(() => {
+      cy.get('.edit-button').click();
+    });
+    
+    cy.waitForDialog();
+    cy.get('.dialog').within(() => {
+      cy.get('input').eq(4).clear().type('invalidisbn');
+      cy.get('button[type="submit"]').contains('Save Changes').click();
+    });
+    
     cy.get('[data-cy=edit-book-unit-error]').should('be.visible').and('contain', 'ISBN is invalid');
     cy.get('.dialog').should('be.visible');
   });

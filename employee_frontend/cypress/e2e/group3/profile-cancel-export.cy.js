@@ -14,9 +14,9 @@ describe('Profile Cancel Export', () => {
   });
 
   it('allows a user to cancel exporting their personal data', () => {
-    cy.contains('Export My Data').click();
+    cy.contains('Export My Data').should('be.visible').click();
     cy.contains('Do you want to export your data?').should('be.visible');
-    cy.contains('Cancel').click();
+    cy.contains('Cancel').should('be.visible').click();
     cy.contains('Do you want to export your data?').should('not.exist');
   });
 }); 

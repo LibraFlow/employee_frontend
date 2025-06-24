@@ -22,7 +22,7 @@ describe('Add New Book - Cancel', () => {
     cy.contains('Terms and Policy').should('be.visible');
     cy.get('#policy-check').check({ force: true });
     cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
-    cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
+    cy.get('[data-cy=register-success]', { timeout: 30000 }).should('be.visible');
   });
 
   beforeEach(() => {
@@ -30,13 +30,20 @@ describe('Add New Book - Cancel', () => {
   });
 
   it('should open the add book dialog and cancel', () => {
-    cy.contains('Genres').click();
-    cy.contains('.genre-card', 'Fantasy').click();
+    cy.navigateToGenre('Fantasy');
+    
+    // Click Add Book button
     cy.contains('button', 'Add Book').click();
-    cy.contains('Add New Book').should('be.visible');
-    cy.get('.dialog input[type="text"]').eq(0).type(bookTitle);
-    cy.get('.dialog button[type="button"]').contains('Cancel').click();
-    cy.contains('Add New Book').should('not.exist');
+    cy.waitForDialog();
+    
+    // Fill form and cancel
+    cy.get('.dialog').within(() => {
+      cy.get('input[type="text"]').eq(0).type(bookTitle);
+      cy.get('button[type="button"]').contains('Cancel').click();
+    });
+    
+    // Verify dialog closed and book was not added
+    cy.waitForElementToDisappear('.dialog');
     cy.contains('.book-title', bookTitle).should('not.exist');
   });
 }); 

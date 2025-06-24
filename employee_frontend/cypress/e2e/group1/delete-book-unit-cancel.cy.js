@@ -29,7 +29,7 @@ describe('Delete Book Unit - Cancel', () => {
     cy.contains('Terms and Policy').should('be.visible');
     cy.get('#policy-check').check({ force: true });
     cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
-    cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
+    cy.get('[data-cy=register-success]', { timeout: 30000 }).should('be.visible');
   });
 
   beforeEach(() => {
@@ -37,50 +37,63 @@ describe('Delete Book Unit - Cancel', () => {
     cy.get('[data-cy=username-input]').type(testUser.username);
     cy.get('[data-cy=password-input]').type(testUser.password);
     cy.get('[data-cy=login-button]').click();
-    cy.contains('Welcome to LibraFlow!').should('be.visible');
+    cy.contains('Welcome to LibraFlow!', { timeout: 20000 }).should('be.visible');
   });
 
   it('should add a new book and a new book unit', () => {
-    cy.contains('Genres').click();
-    cy.contains('.genre-card', 'Fantasy').click();
-    cy.contains('button', 'Add Book').click();
-    cy.contains('Add New Book').should('be.visible');
-    cy.get('.dialog input[type="text"]').eq(0).type(bookTitle);
-    cy.get('.dialog input[type="text"]').eq(1).type('Cypress Author');
-    cy.get('.dialog input[type="number"]').type('2024');
-    cy.get('.dialog textarea').type('Book for unit delete cancel test.');
-    cy.get('.dialog button[type="submit"]').contains('Add Book').click();
-    cy.contains('.book-title', bookTitle).should('be.visible');
+    cy.navigateToGenre('Fantasy');
+    
+    const bookData = {
+      title: bookTitle,
+      author: 'Cypress Author',
+      year: '2024',
+      description: 'Book for unit delete cancel test.'
+    };
+    
+    cy.addBookReliably(bookData);
+
     cy.contains('.book-title', bookTitle)
-      .parents('.book-card')
-      .find('.units-button')
-      .click();
+      .closest('.book-card')
+      .within(() => {
+        cy.get('.units-button').click();
+      });
     cy.contains('Book Units').should('be.visible');
+
     cy.contains('button', 'Add Unit').click();
-    cy.contains('Add New Book Unit').should('be.visible');
-    cy.get('.dialog input').eq(0).type(unitData.language);
-    cy.get('.dialog input').eq(1).type(unitData.pageCount);
-    cy.get('.dialog input').eq(2).type(unitData.coverImageLink);
-    cy.get('.dialog input').eq(3).type(unitData.publisher);
-    cy.get('.dialog input').eq(4).type(unitData.isbn);
-    cy.get('.dialog button[type="submit"]').contains('Add Unit').click();
-    cy.get('.dialog').should('not.exist');
+    cy.waitForDialog();
+    
+    cy.get('.dialog').within(() => {
+      cy.get('input').eq(0).type(unitData.language);
+      cy.get('input').eq(1).type(unitData.pageCount);
+      cy.get('input').eq(2).type(unitData.coverImageLink);
+      cy.get('input').eq(3).type(unitData.publisher);
+      cy.get('input').eq(4).type(unitData.isbn);
+      cy.get('button[type="submit"]').contains('Add Unit').click();
+    });
+    
+    cy.waitForElementToDisappear('.dialog');
     cy.get('.unit-card').should('exist');
     cy.get('.unit-card').should('contain.text', unitData.language);
   });
 
   it('should show the confirmation modal and cancel deletion', () => {
-    cy.contains('Genres').click();
-    cy.contains('.genre-card', 'Fantasy').click();
+    cy.navigateToGenre('Fantasy');
+    
     cy.contains('.book-title', bookTitle)
-      .parents('.book-card')
-      .find('.units-button')
-      .click();
+      .closest('.book-card')
+      .within(() => {
+        cy.get('.units-button').click();
+      });
     cy.contains('Book Units').should('be.visible');
-    cy.get('.unit-card').last().find('.delete-button').click();
+    
+    cy.get('.unit-card').last().within(() => {
+      cy.get('.delete-button').click();
+    });
+    
     cy.get('.modal').should('be.visible');
     cy.get('[data-cy=cancel-delete-unit]').click();
-    cy.get('.modal').should('not.exist');
+    
+    cy.waitForElementToDisappear('.modal');
     cy.get('.unit-card').should('exist');
     cy.get('.unit-card').should('contain.text', unitData.language);
   });

@@ -14,9 +14,9 @@ describe('Profile Delete Account', () => {
   });
 
   it('allows a user to delete their own account', () => {
-    cy.contains('Delete My Account').click();
+    cy.contains('Delete My Account').should('be.visible').click();
     cy.contains('Are you sure you want to delete your account?').should('be.visible');
-    cy.contains('Yes, Delete').click();
+    cy.contains('Yes, Delete').should('be.visible').click();
     cy.url().should('include', '/login');
   });
 }); 
