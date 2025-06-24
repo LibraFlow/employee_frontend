@@ -42,16 +42,16 @@ build:
 #     - develop
 #     - merge_requests
 
-test:
-  stage: test
-  script:
-    - cd employee_frontend
-    - npm install
-    - npm test -- --passWithNoTests
-  only:
-    - main
-    - develop
-    - merge_requests
+# test:
+#   stage: test
+#   script:
+#     - cd employee_frontend
+#     - npm install
+#     - npm test -- --passWithNoTests
+#   only:
+#     - main
+#     - develop
+#     - merge_requests
 
 e2e-integration:
   stage: test

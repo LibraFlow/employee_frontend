@@ -55,6 +55,17 @@ services:
     volumes:
       - db5-data:/var/lib/postgresql/data
 
+  db6:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user6
+      POSTGRES_PASSWORD: password6
+      POSTGRES_DB: db6
+    ports:
+      - "5437:5432"
+    volumes:
+      - db6-data:/var/lib/postgresql/data
+
   book-service:
     image: starcraftfan/book-service:latest
     ports:
@@ -96,16 +107,16 @@ services:
     ports:
       - "8087:8087"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db5:5432/db5
-      - SPRING_DATASOURCE_USERNAME=user5
-      - SPRING_DATASOURCE_PASSWORD=password5
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db6:5432/db6
+      - SPRING_DATASOURCE_USERNAME=user6
+      - SPRING_DATASOURCE_PASSWORD=password6
       - JWT_SECRET=12345678901234567890123456789012
       - KEYPART_ONE=wRJoqINwixKE9UwbjAO+wg==
       - KEYPART_TWO=/c2hupbW+7wgghMUKqg7mg==
       - ENCRYPTION_KEY=5WvoJZzv2iJDZo2Asn+VYib2+2WLrnLGpLZSJXs2EmA=
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
-      - db5
+      - db6
 
   api-gateway:
     image: starcraftfan/api-gateway:latest
@@ -132,3 +143,4 @@ volumes:
   db3-data:
   db4-data:
   db5-data:
+  db6-data:

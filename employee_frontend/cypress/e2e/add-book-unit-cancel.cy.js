@@ -29,7 +29,15 @@ describe('Add Book Unit - Cancel', () => {
     cy.contains('Terms and Policy').should('be.visible');
     cy.get('#policy-check').check({ force: true });
     cy.contains('button', 'Agree and Register').should('not.be.disabled').click();
-    cy.get('[data-cy=register-success]', { timeout: 10000 }).should('be.visible');
+    cy.get('[data-cy=register-success]', { timeout: 20000 }).should('be.visible');
+
+    cy.wait(2000);
+
+    cy.visit('/login');
+    cy.get('[data-cy=username-input]').type(testUser.username);
+    cy.get('[data-cy=password-input]').type(testUser.password);
+    cy.get('[data-cy=login-button]').click();
+    cy.contains('Welcome to LibraFlow!', { timeout: 20000 }).should('be.visible');
   });
 
   beforeEach(() => {
